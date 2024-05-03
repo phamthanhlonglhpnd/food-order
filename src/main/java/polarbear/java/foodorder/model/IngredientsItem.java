@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "ingredients_item")
 public class IngredientsItem {
 
     @Id
@@ -20,7 +19,7 @@ public class IngredientsItem {
     private String name;
 
     @ManyToOne
-    private IngredientCategory ingredientCategory;
+    private IngredientCategory category;
 
     @JsonIgnore
     @ManyToOne

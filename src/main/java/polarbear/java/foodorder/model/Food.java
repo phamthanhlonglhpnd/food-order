@@ -13,7 +13,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "foods")
 public class Food {
 
     @Id
@@ -25,7 +24,6 @@ public class Food {
     private Long price;
 
     @ManyToOne
-    @Column(name = "food_category")
     private Category foodCategory;
 
     @Column(length = 1000)
