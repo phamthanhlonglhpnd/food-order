@@ -12,7 +12,7 @@ import polarbear.java.foodorder.service.RestaurantService;
 import polarbear.java.foodorder.service.UserService;
 
 @RestController
-@RequestMapping("/api/admin/restaurant")
+@RequestMapping("/api/admin/restaurants")
 public class AdminRestaurantController {
 
     @Autowired
@@ -56,6 +56,15 @@ public class AdminRestaurantController {
             @PathVariable Long id
     ) throws Exception {
         Restaurant restaurant = restaurantService.updateRestaurantStatus(id);
+        return new ResponseEntity<>(restaurant, HttpStatus.OK);
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<Restaurant> findRestaurantByUserId(
+            @RequestHeader("Authorization") String jwt
+    ) throws Exception {
+        User user = userService.findUserByJwtToken(jwt);
+        Restaurant restaurant = restaurantService.getRestaurantByUserId(user.getId());
         return new ResponseEntity<>(restaurant, HttpStatus.OK);
     }
 

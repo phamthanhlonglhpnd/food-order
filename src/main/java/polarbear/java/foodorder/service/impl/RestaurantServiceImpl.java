@@ -1,6 +1,7 @@
 package polarbear.java.foodorder.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import polarbear.java.foodorder.dto.RestaurantDto;
 import polarbear.java.foodorder.model.Address;
 import polarbear.java.foodorder.model.Restaurant;
@@ -10,12 +11,13 @@ import polarbear.java.foodorder.repository.RestaurantRepository;
 import polarbear.java.foodorder.repository.UserRepository;
 import polarbear.java.foodorder.request.CreateRestaurantRequest;
 import polarbear.java.foodorder.service.RestaurantService;
-import polarbear.java.foodorder.service.UserService;
+
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class RestaurantServiceImpl implements RestaurantService {
 
     @Autowired
@@ -101,11 +103,18 @@ public class RestaurantServiceImpl implements RestaurantService {
         restaurantDto.setTitle(restaurant.getName());
         restaurantDto.setId(restaurantId);
 
-        if(user.getFavorites().contains(restaurantDto)) {
-            user.getFavorites().remove(restaurantDto);
-        } else {
-            user.getFavorites().add(restaurantDto);
+        List<RestaurantDto> favorites = user.getFavorites();
+        boolean isFavorited = false;
+        for(RestaurantDto favorite : favorites) {
+            if(favorite.getId().equals(restaurantId)) {
+                isFavorited = true;
+                break;
+            }
         }
+        if(isFavorited) {
+            favorites.removeIf(favorite -> favorite.getId().equals(restaurantId));
+        } else favorites.add(restaurantDto);
+
         userRepository.save(user);
         return restaurantDto;
     }
