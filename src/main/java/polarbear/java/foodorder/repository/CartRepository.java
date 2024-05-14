@@ -6,4 +6,5 @@ import polarbear.java.foodorder.model.Cart;
 
 @Repository
 public interface CartRepository extends JpaRepository<Cart, Long> {
+    Cart findCardByCustomerId(Long userId);
 }
