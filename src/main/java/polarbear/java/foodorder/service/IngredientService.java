@@ -16,5 +16,5 @@ public interface IngredientService {
 
     public List<IngredientsItem> findRestaurantIngredients(Long restaurantId);
 
-    public IngredientsItem updateStock(Long id) throws Exception;
+    public IngredientsItem updateStoke(Long id) throws Exception;
 }

@@ -42,23 +42,38 @@ public class IngredientServiceImpl implements IngredientService {
     }
 
     @Override
-    public List<IngredientCategory> findIngredientCategoryByRestaurantId(Long id) throws Exception {
-        return ingredientCategoryRepository.findIngredientCategoryByRestaurantId(id);
+    public List<IngredientCategory> findIngredientCategoryByRestaurantId(Long restaurantId) throws Exception {
+        return ingredientCategoryRepository.findIngredientCategoryByRestaurantId(restaurantId);
     }
 
     @Override
     public IngredientsItem createIngredientsItem(Long restaurantId, String ingredientName, Long categoryId) throws Exception {
+        Restaurant restaurant = restaurantService.findRestaurantById(restaurantId);
+        IngredientCategory category = findIngredientCategoryById(categoryId);
 
-        return null;
+        IngredientsItem item = new IngredientsItem();
+        item.setName(ingredientName);
+        item.setRestaurant(restaurant);
+        item.setCategory(category);
+
+        IngredientsItem ingredientsItem = ingredientItemRepository.save(item);
+        category.getIngredients().add(ingredientsItem);
+        return ingredientsItem;
     }
 
     @Override
     public List<IngredientsItem> findRestaurantIngredients(Long restaurantId) {
-        return null;
+        return ingredientItemRepository.findIngredientsItemByRestaurantId(restaurantId);
     }
 
     @Override
-    public IngredientsItem updateStock(Long id) throws Exception {
-        return null;
+    public IngredientsItem updateStoke(Long id) throws Exception {
+        Optional<IngredientsItem> ingredientsItem = ingredientItemRepository.findById(id);
+        if(ingredientsItem.isEmpty()) {
+            throw new Exception("Ingredient item is not found");
+        }
+        IngredientsItem items = ingredientsItem.get();
+        items.setInStoke(!items.isInStoke());
+        return ingredientItemRepository.save(items);
     }
 }
