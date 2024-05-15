@@ -1,1 +1,1 @@
-This is my first pet project using Java, Java Srping Boot
+This is my first pet project using Java, Java Spring Boot
