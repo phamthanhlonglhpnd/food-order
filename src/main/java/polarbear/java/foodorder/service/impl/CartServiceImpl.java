@@ -13,6 +13,8 @@ import polarbear.java.foodorder.service.CartService;
 import polarbear.java.foodorder.service.FoodService;
 import polarbear.java.foodorder.service.UserService;
 
+import java.util.Optional;
+
 @Service
 public class CartServiceImpl implements CartService {
 
@@ -40,36 +42,74 @@ public class CartServiceImpl implements CartService {
                 return updateCartItemQuantity(cartItem.getId(), newQuantity);
             }
         }
-        return null;
+
+        CartItem newCartItem = new CartItem();
+        newCartItem.setFood(food);
+        newCartItem.setCart(cart);
+        newCartItem.setQuantity(req.getQuantity());
+        newCartItem.setIngredients(req.getIngredients());
+        newCartItem.setTotalPrice(req.getQuantity() * food.getPrice());
+
+        CartItem savedCartItem = cartItemRepository.save(newCartItem);
+        cart.getItems().add(savedCartItem);
+        return savedCartItem;
     }
 
     @Override
     public CartItem updateCartItemQuantity(Long cartItemId, int quantity) throws Exception {
-        return null;
+        Optional<CartItem> cartItemOptional = cartItemRepository.findById(cartItemId);
+        if(cartItemOptional.isEmpty()) {
+            throw new Exception("Cart Item is not found");
+        }
+        CartItem item = cartItemOptional.get();
+        item.setQuantity(quantity);
+        item.setTotalPrice(item.getFood().getPrice() * quantity);
+
+        return cartItemRepository.save(item);
     }
 
     @Override
     public Cart removeItemFromCart(Long cartItemId, String jwt) throws Exception {
-        return null;
+        User user = userService.findUserByJwtToken(jwt);
+        Cart cart = cartRepository.findCardByCustomerId(user.getId());
+        Optional<CartItem> cartItemOptional = cartItemRepository.findById(cartItemId);
+        if(cartItemOptional.isEmpty()) {
+            throw new Exception("Cart Item is not found");
+        }
+        CartItem item = cartItemOptional.get();
+        cart.getItems().remove(item);
+        return cartRepository.save(cart);
     }
 
     @Override
     public Long calculateCartTotal(Cart cart) throws Exception {
-        return null;
+        long total = 0L;
+        for(CartItem cartItem : cart.getItems()) {
+            total += cartItem.getFood().getPrice() * cartItem.getQuantity();
+        }
+
+        return total;
     }
 
     @Override
     public Cart findCartById(Long id) throws Exception {
-        return null;
+        Optional<Cart> cart = cartRepository.findById(id);
+        if(cart.isEmpty()) {
+            throw new Exception("Cart is not found");
+        }
+        return cart.get();
     }
 
     @Override
     public Cart findCartByUserId(Long userId) throws Exception {
-        return null;
+        return cartRepository.findCardByCustomerId(userId);
     }
 
     @Override
-    public Cart clearCart(Long userId) throws Exception {
-        return null;
+    public Cart clearCart(String jwt) throws Exception {
+        User user = userService.findUserByJwtToken(jwt);
+        Cart cart = findCartByUserId(user.getId());
+        cart.getItems().clear();
+        return cartRepository.save(cart);
     }
 }
